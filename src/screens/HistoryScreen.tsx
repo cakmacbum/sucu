@@ -7,7 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export function HistoryScreen() {
   const navigate = useNavigate();
-  const { currentAmount, targetAmount } = useApp();
+  const { currentAmount, targetAmount, history } = useApp();
   const { t } = useLanguage();
   const percentage = Math.min(Math.round((currentAmount / targetAmount) * 100), 100);
 
@@ -44,56 +44,38 @@ export function HistoryScreen() {
         </section>
 
         <div className="space-y-6">
-          <div className="group">
-            <div className="flex justify-between items-end mb-3 px-1">
-              <div>
-                <h2 className="text-on-surface font-bold text-base">24 Mart Pazartesi</h2>
-                <p className="text-secondary text-xs">Dün</p>
+          {history && history.length > 0 ? history.map((record) => (
+            <div key={record.id} className="group">
+              <div className="flex justify-between items-end mb-3 px-1">
+                <div>
+                  <h2 className="text-on-surface font-bold text-base">{record.dateString}</h2>
+                  <p className="text-secondary text-xs">{record.totalAmount >= record.targetAmount ? t('targetCompleted', { percent: 100 }) : `%${Math.round((record.totalAmount / record.targetAmount) * 100)}`}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-primary font-extrabold text-lg">{record.totalAmount.toLocaleString('tr-TR')}</span>
+                  <span className="text-secondary text-xs ml-0.5">ml</span>
+                </div>
               </div>
-              <div className="text-right">
-                <span className="text-primary font-extrabold text-lg">2.100</span>
-                <span className="text-secondary text-xs ml-0.5">ml</span>
+              <div className="bg-surface-container-low rounded-xl overflow-hidden p-1 space-y-1">
+                <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
+                      <Droplet className="w-5 h-5 fill-current" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm text-on-surface">{t('totalIntake')}</p>
+                      <p className="text-[10px] text-secondary">{t('water')}</p>
+                    </div>
+                  </div>
+                  <span className="font-bold text-sm text-on-surface">{record.totalAmount.toLocaleString('tr-TR')} ml</span>
+                </div>
               </div>
             </div>
-            <div className="bg-surface-container-low rounded-xl overflow-hidden p-1 space-y-1">
-              <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
-                    <Droplet className="w-5 h-5 fill-current" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-on-surface">{t('water')}</p>
-                    <p className="text-[10px] text-secondary">08:30</p>
-                  </div>
-                </div>
-                <span className="font-bold text-sm text-on-surface">500 ml</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
-                    <Coffee className="w-5 h-5 fill-current" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-on-surface">{t('juice')}</p>
-                    <p className="text-[10px] text-secondary">12:15</p>
-                  </div>
-                </div>
-                <span className="font-bold text-sm text-on-surface">330 ml</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
-                    <Droplet className="w-5 h-5 fill-current" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-on-surface">{t('water')}</p>
-                    <p className="text-[10px] text-secondary">15:45</p>
-                  </div>
-                </div>
-                <span className="font-bold text-sm text-on-surface">500 ml</span>
-              </div>
+          )) : (
+            <div className="text-center py-10 opacity-50">
+              <p className="text-sm font-medium">{t('noDataDesc') || 'Henüz geçmiş kaydınız bulunmuyor.'}</p>
             </div>
-          </div>
+          )}
         </div>
       </main>
 

@@ -53,7 +53,11 @@ export const translations = {
     navHome: "Home",
     navHistory: "History",
     navInsights: "Insights",
-    navProfile: "Profile"
+    navProfile: "Profile",
+    noDataDesc: "No history records found yet.",
+    settings: "Settings",
+    enableNotifications: "Enable Notifications",
+    notificationMessage: "Time to drink water!"
   },
   tr: {
     getStarted: "Başla",
@@ -109,7 +113,11 @@ export const translations = {
     navHome: "Ana Sayfa",
     navHistory: "Geçmiş",
     navInsights: "Analiz",
-    navProfile: "Profil"
+    navProfile: "Profil",
+    noDataDesc: "Henüz geçmiş kaydınız bulunmuyor.",
+    settings: "Ayarlar",
+    enableNotifications: "Bildirimi Aktifleştir",
+    notificationMessage: "Su içme vakti geldi"
   },
   es: {
     getStarted: "Empezar",
@@ -165,6 +173,10 @@ export const translations = {
     navHome: "Inicio",
     navHistory: "Historial",
     navInsights: "Análisis",
-    navProfile: "Perfil"
+    navProfile: "Perfil",
+    noDataDesc: "Aún no hay registros de historial.",
+    settings: "Ajustes",
+    enableNotifications: "Habilitar Notificaciones",
+    notificationMessage: "¡Es hora de beber agua!"
   }
 };

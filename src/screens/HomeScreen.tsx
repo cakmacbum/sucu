@@ -1,14 +1,17 @@
-import { Settings, Droplet, Coffee, Plus, X, Wine, CupSoda, Milk, Beer } from 'lucide-react';
+import { Settings, Droplet, Coffee, Plus, X, Wine, CupSoda, Milk, Beer, Bell } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BottomNav } from '../components/BottomNav';
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 export function HomeScreen() {
-  const { currentAmount, targetAmount, addWater, profile } = useApp();
+  const { currentAmount, targetAmount, addWater, profile, notificationsEnabled, toggleNotifications } = useApp();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const percentage = Math.min(Math.round((currentAmount / targetAmount) * 100), 100);
 
@@ -21,11 +24,16 @@ export function HomeScreen() {
     >
       <header className="flex-none bg-white/95 backdrop-blur-md z-50 border-b border-slate-200/60 shadow-sm">
         <div className="flex justify-between items-center w-full px-6 py-3 max-w-xl mx-auto">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center border border-primary/5">
-            <img alt="User profile" className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop" />
+          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
+            <img 
+              src="/logo.png" 
+              onError={(e) => { e.currentTarget.src = '/vite.svg'; }}
+              alt="Fluidity Logo" 
+              className="w-full h-full object-cover" 
+            />
           </div>
           <h1 className="font-headline text-lg font-bold tracking-tight text-blue-600">Fluidity</h1>
-          <div className="hover:opacity-80 transition-opacity scale-95 duration-200 ease-out cursor-pointer">
+          <div className="hover:opacity-80 transition-opacity scale-95 duration-200 ease-out cursor-pointer" onClick={() => setIsSettingsOpen(true)}>
             <Settings className="w-6 h-6 text-slate-600" />
           </div>
         </div>
@@ -181,6 +189,56 @@ export function HomeScreen() {
           </>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-scrim/40 z-[60] backdrop-blur-sm"
+              onClick={() => setIsSettingsOpen(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="absolute top-16 right-6 w-64 bg-surface rounded-2xl shadow-xl z-[70] overflow-hidden border border-slate-200/50"
+            >
+              <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-surface-container-lowest">
+                <h3 className="font-bold text-on-surface flex items-center gap-2 text-sm">
+                  <Settings className="w-4 h-4 text-primary" />
+                  {t('settings') || "Ayarlar"}
+                </h3>
+                <button onClick={() => setIsSettingsOpen(false)} className="text-secondary hover:text-on-surface">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
+                      <Bell className="w-3.5 h-3.5 text-primary" />
+                      {t('enableNotifications') || "Bildirimi Aktifleştir"}
+                    </span>
+                    <span className="text-[10px] text-secondary mt-0.5">Her 3 saatte bir</span>
+                  </div>
+                  <button 
+                    onClick={toggleNotifications}
+                    className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors duration-300 ease-in-out ${notificationsEnabled ? 'bg-primary' : 'bg-surface-container-highest'}`}
+                  >
+                    <div 
+                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${notificationsEnabled ? 'translate-x-5' : 'translate-x-0'}`} 
+                    />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <BottomNav />
     </motion.div>
   );

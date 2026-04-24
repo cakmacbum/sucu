@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil, User, Droplet, RotateCcw, Trash2, CheckCircle2, Globe } from 'lucide-react';
+import { ArrowLeft, Pencil, User, Droplet, RotateCcw, Trash2, CheckCircle2, Globe, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { BottomNav } from '../components/BottomNav';
@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 export function ProfileScreen() {
   const navigate = useNavigate();
-  const { profile, targetAmount, resetStats, resetProfile } = useApp();
+  const { profile, targetAmount, resetStats, resetProfile, notificationsEnabled, toggleNotifications } = useApp();
   const { t, language, setLanguage } = useLanguage();
   const [showToast, setShowToast] = useState(false);
 
@@ -60,12 +60,8 @@ export function ProfileScreen() {
         {/* Profile Header/Avatar Section */}
         <section className="flex flex-col items-center justify-center space-y-2">
           <div className="relative group">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-primary-fixed flex items-center justify-center text-primary">
-              <img 
-                className="w-full h-full object-cover" 
-                alt="Profile" 
-                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop" 
-              />
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-primary-container flex items-center justify-center text-primary shadow-sm border border-primary/10">
+              <span className="font-headline text-3xl font-bold">{profile?.name ? profile.name.charAt(0).toUpperCase() : 'U'}</span>
             </div>
             <button className="absolute bottom-0 right-0 bg-primary text-on-primary p-1.5 rounded-full shadow-lg scale-95 hover:scale-100 transition-transform">
               <Pencil className="w-3 h-3" />
@@ -143,6 +139,25 @@ export function ProfileScreen() {
               className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${language === 'es' ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container-high'}`}
             >
               Español
+            </button>
+          </div>
+        </section>
+
+        {/* Notifications & Settings Section */}
+        <section className="bg-surface-container-low rounded-xl p-4 space-y-4">
+          <h3 className="text-on-surface font-semibold text-base mb-1 flex items-center gap-2">
+            <Bell className="w-4 h-4 text-primary" />
+            {t('settings') || "Settings"}
+          </h3>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-on-surface">{t('enableNotifications') || "Enable Notifications"}</span>
+            <button 
+              onClick={toggleNotifications}
+              className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ease-in-out ${notificationsEnabled ? 'bg-primary' : 'bg-surface-container-highest'}`}
+            >
+              <div 
+                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${notificationsEnabled ? 'translate-x-6' : 'translate-x-0'}`} 
+              />
             </button>
           </div>
         </section>

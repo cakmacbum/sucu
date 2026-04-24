@@ -1,14 +1,55 @@
 import { ArrowLeft, Calendar, TrendingUp, Timer, Flame, Droplet, Coffee, Apple, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { useState, useMemo } from 'react';
 import { BottomNav } from '../components/BottomNav';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 
+type TimeFilter = 'day' | 'week' | 'month' | 'year';
+
 export function InsightsScreen() {
   const navigate = useNavigate();
-  const { currentAmount } = useApp();
+  const { currentAmount, targetAmount } = useApp();
   const { t } = useLanguage();
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('week');
+
+  const currentPerc = targetAmount > 0 ? Math.min(Math.round((currentAmount / targetAmount) * 100), 100) : 0;
+
+  const chartData = useMemo(() => {
+    switch (timeFilter) {
+      case 'day':
+        // 6 segments representing parts of the day, last one is current
+        return {
+          bars: [20, 35, 50, 45, 80, currentPerc],
+          gap: 'gap-2'
+        };
+      case 'week':
+        // 7 days, last one is today
+        return {
+          bars: [40, 65, 50, 85, 95, 60, currentPerc],
+          gap: 'gap-2'
+        };
+      case 'month':
+        // 30 days, last one is today
+        const monthBars = Array.from({ length: 29 }, () => Math.floor(Math.random() * 60) + 20);
+        monthBars.push(currentPerc);
+        return {
+          bars: monthBars,
+          gap: 'gap-[2px]'
+        };
+      case 'year':
+        // 12 months, last one is current month
+        const yearBars = Array.from({ length: 11 }, () => Math.floor(Math.random() * 50) + 40);
+        yearBars.push(currentPerc);
+        return {
+          bars: yearBars,
+          gap: 'gap-1.5'
+        };
+      default:
+        return { bars: [], gap: 'gap-1' };
+    }
+  }, [timeFilter, currentPerc]);
 
   return (
     <motion.div 
@@ -36,10 +77,30 @@ export function InsightsScreen() {
         {/* Segmented Filter */}
         <section className="flex-none">
           <div className="bg-surface-container-low p-1 rounded-full flex items-center">
-            <button className="flex-1 py-1.5 text-xs font-bold rounded-full bg-surface-container-lowest text-primary shadow-sm">{t('day1')}</button>
-            <button className="flex-1 py-1.5 text-xs font-semibold text-secondary hover:text-on-surface transition-colors">{t('week1')}</button>
-            <button className="flex-1 py-1.5 text-xs font-semibold text-secondary hover:text-on-surface transition-colors">{t('month1')}</button>
-            <button className="flex-1 py-1.5 text-xs font-semibold text-secondary hover:text-on-surface transition-colors">{t('year1')}</button>
+            <button 
+              onClick={() => setTimeFilter('day')} 
+              className={`flex-1 py-1.5 text-xs transition-colors ${timeFilter === 'day' ? 'font-bold rounded-full bg-surface-container-lowest text-primary shadow-sm' : 'font-semibold text-secondary hover:text-on-surface'}`}
+            >
+              {t('day1') || '1 Gün'}
+            </button>
+            <button 
+              onClick={() => setTimeFilter('week')} 
+              className={`flex-1 py-1.5 text-xs transition-colors ${timeFilter === 'week' ? 'font-bold rounded-full bg-surface-container-lowest text-primary shadow-sm' : 'font-semibold text-secondary hover:text-on-surface'}`}
+            >
+              {t('week1') || '1 Hafta'}
+            </button>
+            <button 
+              onClick={() => setTimeFilter('month')} 
+              className={`flex-1 py-1.5 text-xs transition-colors ${timeFilter === 'month' ? 'font-bold rounded-full bg-surface-container-lowest text-primary shadow-sm' : 'font-semibold text-secondary hover:text-on-surface'}`}
+            >
+              {t('month1') || '1 Ay'}
+            </button>
+            <button 
+              onClick={() => setTimeFilter('year')} 
+              className={`flex-1 py-1.5 text-xs transition-colors ${timeFilter === 'year' ? 'font-bold rounded-full bg-surface-container-lowest text-primary shadow-sm' : 'font-semibold text-secondary hover:text-on-surface'}`}
+            >
+              {t('year1') || '1 Yıl'}
+            </button>
           </div>
         </section>
 
@@ -49,24 +110,31 @@ export function InsightsScreen() {
           <section className="col-span-2 bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_24px_rgba(0,81,224,0.04)] relative overflow-hidden">
             <div className="flex justify-between items-end mb-4 relative z-10">
               <div>
-                <p className="font-label text-[10px] font-semibold text-secondary uppercase tracking-widest mb-0.5">{t('totalIntake')}</p>
-                <h2 className="text-2xl font-extrabold tracking-tight text-on-surface">{(currentAmount / 1000).toFixed(1)} <span className="text-sm font-medium text-secondary">{t('liter')}</span></h2>
+                <p className="font-label text-[10px] font-semibold text-secondary uppercase tracking-widest mb-0.5">{t('totalIntake') || 'Toplam Su Alımı'}</p>
+                <h2 className="text-2xl font-extrabold tracking-tight text-on-surface">{(currentAmount / 1000).toFixed(1)} <span className="text-sm font-medium text-secondary">{t('liter') || 'Litre'}</span></h2>
               </div>
               <div className="text-right">
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
-                  <TrendingUp className="w-3 h-3 mr-1" /> 12% {t('increase')}
+                  <TrendingUp className="w-3 h-3 mr-1" /> 12% {t('increase') || 'Artış'}
                 </span>
               </div>
             </div>
 
             {/* Abstract Liquid Chart Representation */}
-            <div className="h-24 w-full flex items-end gap-2 relative">
-              {[40, 65, 50, 85, 95, 60, 45].map((height, i) => (
-                <div key={i} className={`flex-1 rounded-t-xl relative group cursor-pointer ${i === 4 ? 'bg-primary-container' : 'bg-primary-fixed/30'}`} style={{ height: `${height}%` }}>
-                  {i !== 4 && <div className="absolute inset-0 bg-primary-container rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>}
-                  {i === 4 && <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-on-primary-container text-white text-[8px] py-0.5 px-1.5 rounded font-bold whitespace-nowrap">{t('today')}</div>}
-                </div>
-              ))}
+            <div className={`h-24 w-full flex items-end ${chartData.gap} relative`}>
+              {chartData.bars.map((height, i) => {
+                const isLast = i === chartData.bars.length - 1;
+                return (
+                  <div key={i} className={`flex-1 rounded-t-xl relative group cursor-pointer transition-all duration-500 ease-in-out ${isLast ? 'bg-primary-container' : 'bg-primary-fixed/30'}`} style={{ height: `${height}%` }}>
+                    {!isLast && <div className="absolute inset-0 bg-primary-container rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>}
+                    {isLast && (
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-on-primary-container z-20 text-white text-[8px] py-0.5 px-1.5 rounded font-bold whitespace-nowrap">
+                        {timeFilter === 'year' ? 'Bu Ay' : (timeFilter === 'day' ? 'Şimdi' : (t('today') || 'Bugün'))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Fluid Background Ornament */}
